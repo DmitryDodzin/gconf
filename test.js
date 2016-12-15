@@ -1,4 +1,5 @@
 
+const sinon = require('sinon');
 const chai = require('chai');
 const assert = chai.assert;
 
@@ -78,4 +79,40 @@ describe('core gconf functionality', () => {
 
   });
 
+  describe('env modifier', () => {
+    var base_config = {
+      foo: 'bar',
+      complex: {
+        foo: {
+          bar: 2000
+        }
+      }
+    };
+
+    it('default env', done => {
+
+      gconf_instance.registerModifier('env');
+
+      gconf_instance.provider = {
+        request: sinon.stub().returns(base_config)
+      };
+
+      let basic_mod = 'barrrr';
+      let complex_mod = {
+        bar: 2001,
+        space: 'odyssey'
+      };
+
+      process.env.GCONF_foo = basic_mod;
+      process.env.GCONF_complex_foo = JSON.stringify(complex_mod);
+
+      assert.equal(gconf_instance.request('default').foo, basic_mod, 'without selector');
+      assert.equal(gconf_instance.request('default', 'foo'), basic_mod, 'with selector');
+      
+      assert.deepEqual(gconf_instance.request('default').complex.foo, complex_mod, 'complex with selector');
+      assert.deepEqual(gconf_instance.request('default', 'complex.foo'), complex_mod, 'complex with selector');
+
+      done();
+    });
+  });
 });
