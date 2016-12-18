@@ -48,8 +48,18 @@ describe('core gconf functionality', () => {
           foo: {
             bar: 2000
           }
+        },
+        default: {
+          fo: 'oo'
         }
       };
+
+    it('no provider fail', done => {
+
+      assert.throws(gconf_instance.request.bind(gconf_instance));
+
+      done();
+    });
 
     it('env selection', done => {
 
@@ -72,6 +82,16 @@ describe('core gconf functionality', () => {
 
       assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
       assert.equal(gconf_instance.request('test', 'foo.bar'), 2000);
+
+      done();
+
+    });
+
+    it('default env selection', done => {
+      
+      gconf_instance.registerProvider('memory', base_config);
+
+      assert.deepEqual(gconf_instance.request(), base_config.default);
 
       done();
 
