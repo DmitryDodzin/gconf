@@ -167,25 +167,51 @@ describe('core gconf functionality', () => {
     before(() => {
       mock_fs({
         '/arse/': {
-          'config.yaml': YAML.stringify({ foo: 'bar' })
+          'config.dev.yaml': YAML.stringify({ foo: 'bar' }),
+          'config.prod.json': JSON.stringify({ foo: 'bar' })
         }
       });
     });
 
-    it('loading yaml files', () => {
+    it('loading files', () => {
       gconf_instance.registerProvider('file', {
         dev: {
-          path: '/arse/config.yaml'
+          path: '/arse/config.dev.yaml'
+        },
+        prod: {
+          path: '/arse/config.prod.json'
         }
       });
 
       assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
+      assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
     });
 
+    it('changing files', () => {
+
+      gconf_instance.registerProvider('file', {
+        dev: {
+          path: '/arse/config.dev.yaml'
+        }
+      });
+
+      assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
+
+      mock_fs({
+        '/arse/': {
+          'config.dev.yaml': YAML.stringify({ foo: 'bar2000' }),
+        }
+      });
+
+      setTimeout(function() {
+        assert.equal(gconf_instance.request('dev', 'foo'), 'bar2000');
+      }, 1000);
+
+    });
+    
     after(() => {
       mock_fs.restore();
     });
 
   });
-
 });
