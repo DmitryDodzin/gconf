@@ -96,7 +96,6 @@ describe('core gconf functionality', () => {
       done();
 
     });
-
   });
 
   describe('env modifier', () => {
@@ -134,5 +133,33 @@ describe('core gconf functionality', () => {
 
       done();
     });
+  });
+
+  describe('singleton', () => {
+
+    before(done => {
+
+      var base_config = {
+        default: {
+          foo: 'bar',
+          test: true
+        }
+      };
+
+      require('./index').loadConfig(base_config);
+
+      done();
+    });
+
+    it('singleton loaded', done => {
+
+      var gconf = require('./index');
+
+      assert.isDefined(gconf.instance, 'instance defined');
+      assert.isNotNull(gconf.instance, 'instance not null');
+
+      done();
+    });
+
   });
 });
