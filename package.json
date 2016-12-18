@@ -1,10 +1,10 @@
 {
   "name": "gconf",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Global and dynamic config provider",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test.js" 
+    "test": "mocha test.js"
   },
   "keywords": [
     "config",
@@ -15,10 +15,12 @@
   "author": "Dmitry Dodzin",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.2"
+    "lodash": "^4.17.2",
+    "yamljs": "^0.2.8"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "mock-fs": "^3.12.1",
     "sinon": "^1.17.6"
   },
   "repository": {

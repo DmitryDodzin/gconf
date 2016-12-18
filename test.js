@@ -2,6 +2,8 @@
 const sinon = require('sinon');
 const chai = require('chai');
 const assert = chai.assert;
+const mock_fs = require('mock-fs');
+const YAML = require('yamljs');
 
 const GConf = require('./index').GConf;
 
@@ -137,7 +139,7 @@ describe('core gconf functionality', () => {
 
   describe('singleton', () => {
 
-    before(done => {
+    before(() => {
 
       var base_config = {
         default: {
@@ -147,8 +149,6 @@ describe('core gconf functionality', () => {
       };
 
       require('./index').loadConfig(base_config);
-
-      done();
     });
 
     it('singleton loaded', done => {
@@ -159,6 +159,58 @@ describe('core gconf functionality', () => {
       assert.isNotNull(gconf.instance, 'instance not null');
 
       done();
+    });
+  });
+
+  describe('file provider', () => {
+
+    before(() => {
+      mock_fs({
+        '/arse/': {
+          'config.dev.yaml': YAML.stringify({ foo: 'bar' }),
+          'config.prod.json': JSON.stringify({ foo: 'bar' })
+        }
+      });
+    });
+
+    it('loading files', () => {
+      gconf_instance.registerProvider('file', {
+        dev: {
+          path: '/arse/config.dev.yaml'
+        },
+        prod: {
+          path: '/arse/config.prod.json'
+        }
+      });
+
+      assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
+      assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
+    });
+
+    it('changing files', () => {
+
+      gconf_instance.registerProvider('file', {
+        dev: {
+          path: '/arse/config.dev.yaml'
+        }
+      });
+
+      assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
+
+      mock_fs({
+        '/arse/': {
+          'config.dev.yaml': YAML.stringify({ foo: 'bar2000' }),
+        }
+      });
+
+      setTimeout(function() {
+        assert.equal(gconf_instance.request('dev', 'foo'), 'bar2000');
+      }, 1000);
+
+    });
+    
+    after(() => {
+      mock_fs.restore();
     });
 
   });
