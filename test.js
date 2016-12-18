@@ -2,6 +2,8 @@
 const sinon = require('sinon');
 const chai = require('chai');
 const assert = chai.assert;
+const mock_fs = require('mock-fs');
+const YAML = require('yamljs');
 
 const GConf = require('./index').GConf;
 
@@ -137,7 +139,7 @@ describe('core gconf functionality', () => {
 
   describe('singleton', () => {
 
-    before(done => {
+    before(() => {
 
       var base_config = {
         default: {
@@ -147,8 +149,6 @@ describe('core gconf functionality', () => {
       };
 
       require('./index').loadConfig(base_config);
-
-      done();
     });
 
     it('singleton loaded', done => {
@@ -160,6 +160,32 @@ describe('core gconf functionality', () => {
 
       done();
     });
+  });
+
+  describe('file provider', () => {
+
+    before(() => {
+      mock_fs({
+        '/arse/': {
+          'config.yaml': YAML.stringify({ foo: 'bar' })
+        }
+      });
+    });
+
+    it('loading yaml files', () => {
+      gconf_instance.registerProvider('file', {
+        dev: {
+          path: '/arse/config.yaml'
+        }
+      });
+
+      assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
+    });
+
+    after(() => {
+      mock_fs.restore();
+    });
 
   });
+
 });
