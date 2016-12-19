@@ -66,6 +66,8 @@ this is the function to use to get the data from the config, meaning (with the e
 
 Are a way to register modifiers and providers not in the constructor
 
+## Providers
+
 ### Memory Provider
 
 Made to load configuration from an object.
@@ -82,16 +84,41 @@ provider name: ``` memory ```
 
 returns the object corresponding to the requested env 
 
+
+### File Provider
+File based fetching of config with ```json``` and ```yaml``` support
+
+provider name: ``` file ```
+
+```javascript
+file: {
+  dev: {
+    path: './config.dev.json',
+    watch: true
+  },
+  prod: {
+    path: './config.prod.json',
+    watch: false
+  }
+}
+```
+
+Will load yaml and json files and ```watch``` will keep them up to date
+
+
+## Modifiers
+
 ### Env Modifier
 
 modifies the base config with Enviroment Variables
+
+modifier name: ``` env ```
 
 ``` {prefix}{splitter}{path} ```
 example:
 ``` GCONF_a_b_c = 'd' => { a: { b: { c: 'd' } } } /// when GCONF is prefix and '_' is splitter```
 
 Splitter and Prefix are defined in the modifier's constructor
-
 
 ###### Credits
 
