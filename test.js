@@ -17,7 +17,7 @@ describe('core gconf functionality', () => {
 
   it('load provider', done => {
 
-    let MemoryProvider = require('./lib/providers/memory');
+    let MemoryProvider = require('./lib/components/providers/memory');
 
     gconf_instance.registerProvider('memory');
 
@@ -28,7 +28,7 @@ describe('core gconf functionality', () => {
 
   it('load modifiers', done => {
 
-    let EnvModifier = require('./lib/modifiers/env');
+    let EnvModifier = require('./lib/components/modifiers/env');
 
     gconf_instance.registerModifier('env');
 
