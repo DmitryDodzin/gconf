@@ -5,7 +5,8 @@ const assert = chai.assert;
 const mock_fs = require('mock-fs');
 const YAML = require('yamljs');
 
-const GConf = require('./index').GConf;
+const gconf = require('./index');
+const GConf = gconf.GConf;
 
 describe('core gconf functionality', () => {
 
@@ -17,7 +18,7 @@ describe('core gconf functionality', () => {
 
   it('load provider', done => {
 
-    let MemoryProvider = require('./lib/providers/memory');
+    let MemoryProvider = require('./lib/components/providers/memory');
 
     gconf_instance.registerProvider('memory');
 
@@ -28,7 +29,7 @@ describe('core gconf functionality', () => {
 
   it('load modifiers', done => {
 
-    let EnvModifier = require('./lib/modifiers/env');
+    let EnvModifier = require('./lib/components/modifiers/env');
 
     gconf_instance.registerModifier('env');
 
@@ -212,6 +213,49 @@ describe('core gconf functionality', () => {
     after(() => {
       mock_fs.restore();
     });
+  });
+
+  describe('pluggin in components', () => {
+
+    it('creating a provider', () => {
+
+      let Provider = require('./lib/components/provider');
+
+      class FooProvider extends Provider{
+        request(env, path) {
+          return 'bar';
+        }
+      }
+
+      gconf.components.registerProvider('foo', FooProvider);
+
+      gconf_instance.registerProvider('foo');
+
+      assert.equal(gconf_instance.request(), 'bar');
+    });
+
+    it('creating a modifier', () => {
+
+      let Modifier = require('./lib/components/modifier');
+
+      class BarModifier extends Modifier{
+        
+        modify(config) {
+          return 'foo';
+        }
+
+      }
+
+      gconf.components.registerModifier('bar', BarModifier);
+
+      gconf_instance.registerProvider('memory', {
+        default: 'arse'
+      });
+      gconf_instance.registerModifier('bar');
+
+      assert.equal(gconf_instance.request(), 'foo');
+    });
 
   });
+
 });
