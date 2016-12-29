@@ -1,4 +1,5 @@
 
+const _ = require('lodash');
 const sinon = require('sinon');
 const chai = require('chai');
 const assert = chai.assert;
@@ -53,7 +54,7 @@ describe('core gconf functionality', () => {
           }
         },
         default: {
-          fo: 'oo'
+          isFoo: false
         }
       };
 
@@ -64,7 +65,7 @@ describe('core gconf functionality', () => {
       done();
     });
 
-    it('env selection', done => {
+    it('env selection', () => {
 
       gconf_instance.registerProvider('memory', base_config);
 
@@ -74,9 +75,7 @@ describe('core gconf functionality', () => {
 
       let prod_config = gconf_instance.request('prod');
       assert.deepEqual(prod_config, { foo: 'bar2000' });
-
-      done();
-
+      
     });
 
     it('path selection', done => {
@@ -102,7 +101,7 @@ describe('core gconf functionality', () => {
   });
 
   describe('env modifier', () => {
-    var base_config = {
+    const base_config = {
       foo: 'bar',
       complex: {
         foo: {
@@ -115,8 +114,15 @@ describe('core gconf functionality', () => {
 
       gconf_instance.registerModifier('env');
 
+      var conf = JSON.parse(JSON.stringify(base_config));
+
       gconf_instance.provider = {
-        request: sinon.stub().returns(base_config)
+        request: (env, path) => {
+          if(path){
+            return _.get(conf, path);
+          }
+          return conf;
+        }
       };
 
       let basic_mod = 'barrrr';
@@ -136,6 +142,77 @@ describe('core gconf functionality', () => {
 
       done();
     });
+  });
+
+  describe('argv modifier', () => {
+    const base_config = {
+      foo: 'bar',
+      complex: {
+        foo: {
+          bar: 2000
+        }
+      }
+    };
+
+    before(() => {
+      var base_argv = process.argv;
+      Object.defineProperty(process, 'argv', {
+        get: () => {
+          return [
+            base_argv[0],
+            base_argv[1],
+            '--foo=barr',
+            '--complex.foo.bar=100'
+          ];
+        }
+      });
+
+      require('yargs').parse(process.argv);
+    });
+
+    it('basic use', () => {
+      gconf_instance.registerModifier('argv');
+
+      var conf = JSON.parse(JSON.stringify(base_config));
+
+      gconf_instance.provider = {
+        request: (env, path) => {
+          if(path){
+            return _.get(conf, path);
+          }
+          return conf;
+        }
+      };
+
+      assert.equal(gconf_instance.request('default').foo, 'barr', 'without selector');
+      assert.equal(gconf_instance.request('default', 'foo'), 'barr', 'with selector');
+      
+      assert.equal(gconf_instance.request('default').complex.foo.bar, 100, 'complex with selector');
+      assert.equal(gconf_instance.request('default', 'complex.foo.bar'), 100, 'complex with selector');
+    });
+
+    it('whitelist', () => {
+
+      gconf_instance.registerModifier('argv', {
+        whitelist:['foo']
+      });
+
+      var conf = JSON.parse(JSON.stringify(base_config));
+
+      gconf_instance.provider = {
+        request: (env, path) => {
+          if(path){
+            return _.get(conf, path);
+          }
+          return conf;
+        }
+      };
+
+      assert.equal(gconf_instance.request('default', 'foo'), 'barr', 'with selector');
+
+      assert.equal(gconf_instance.request('default', 'complex.foo.bar'), conf.complex.foo.bar, 'complex with selector');
+    });
+
   });
 
   describe('singleton', () => {
