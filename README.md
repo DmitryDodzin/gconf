@@ -48,7 +48,7 @@ example config for creating a [memory provider](#memory-provider) with an [env m
 
 this gives me a object ``` { foo: 'bar' } ``` for requesting dev and  ``` { foo: 'bar2000' } ``` for prod.
 
-###``` gconf.request(env, path) ```
+###``` gconf.request(domain, path) ```
 
 this is the function to use to get the data from the config, meaning (with the example config above) you will get 
 
@@ -59,12 +59,40 @@ this is the function to use to get the data from the config, meaning (with the e
 
 ```
 
-```env``` is the env where to look, defined in provider's constructor (options)
+```domain``` is the domain (maybe env or any other generlisation) where to look, defined in provider's constructor (options)
 ```path``` is for geting specific parts of the config and not the entire thing
 
 ###``` gconf.registerProvider(provider, options) ``` & ``` gconf.registerModifier(modifier, options) ```
 
 Are a way to register modifiers and providers not in the constructor
+
+### Singleton Registration
+
+The library implements a singleton factory to save the loaded config.
+
+```javascript
+
+var options = {
+  ...
+}
+
+gconf_instance = new GConf(options);
+
+gconf.loadConfig(gconf_instance); // The loadConfig will retrive ither GConf instance
+
+gconf.loadConfig(options); // or the constructor params for the GConf instance
+
+```
+
+and then you can access it from any part the application
+
+```javascript
+
+var gconf = require('gconf');
+
+gconf.instance // == a gconf instance created in loadConfig.
+
+```
 
 ## Providers
 
@@ -76,13 +104,13 @@ provider name: ``` memory ```
 
 ```javascript
   memory: {
-    env: {
+    domain: {
       ...objectForEnvConfig
     }
   }
 ```
 
-returns the object corresponding to the requested env 
+returns the object corresponding to the requested domain 
 
 
 ### File Provider
@@ -119,6 +147,32 @@ example:
 ``` GCONF_a_b_c = 'd' => { a: { b: { c: 'd' } } } /// when GCONF is prefix and '_' is splitter```
 
 Splitter and Prefix are defined in the modifier's constructor
+
+
+## Extend API
+
+### Creating modifier / provider
+
+There are two classes in ``` gconf.components ```, the ``` Modifier ``` and ``` Provider ``` classes are the base classes for all providers and modifiers accordingly
+
+By extending the base class you can create modifiers or providers
+
+```javascript
+
+class NewProvider extends Provider{
+  
+  // Override the base function
+  request(domain, path){
+    // domain is the config domain, and the path is a path to get to the specified value, both are optional
+  }
+
+}
+
+```
+
+then after creating a class you need to regiter it, this you do through the ``` components.registerProvider('newProvider', NewProvider) ``` and ``` components.registerModifier('newMofifier', NewMofifier) ``` where you need to send the name and class (keep in mind, the class and not an instance). After registration you can use it like every other provider/modifier
+
+
 
 ###### Credits
 

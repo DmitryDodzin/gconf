@@ -261,8 +261,10 @@ describe('core gconf functionality', () => {
         }
       });
 
+      assert.deepEqual(gconf_instance.request('dev'), { foo: 'bar' });
       assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
-      assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
+      assert.deepEqual(gconf_instance.request('prod'), { foo: 'bar' });
+      assert.equal(gconf_instance.request('prod', 'foo'), 'bar');
     });
 
     it('changing files', () => {
