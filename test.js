@@ -226,7 +226,7 @@ describe('core gconf functionality', () => {
         }
       };
 
-      require('./index').loadConfig(base_config);
+      require('./index').load(base_config);
     });
 
     it('singleton loaded', done => {
@@ -265,6 +265,12 @@ describe('core gconf functionality', () => {
       assert.equal(gconf_instance.request('dev', 'foo'), 'bar');
       assert.deepEqual(gconf_instance.request('prod'), { foo: 'bar' });
       assert.equal(gconf_instance.request('prod', 'foo'), 'bar');
+    });
+
+    it('default domain', () => {
+      gconf_instance.registerProvider('file', '/arse/config.dev.yaml');
+
+      assert.deepEqual(gconf_instance.request(), { foo: 'bar' });
     });
 
     it('changing files', () => {
@@ -333,6 +339,36 @@ describe('core gconf functionality', () => {
       gconf_instance.registerModifier('bar');
 
       assert.equal(gconf_instance.request(), 'foo');
+    });
+
+  });
+
+  describe('defult domain', () => {
+
+    const base_config = {
+      foo: {
+        bar: 2000
+      }
+    };
+
+    it('should select default domain', () => {
+
+      var conf = JSON.parse(JSON.stringify(base_config));
+
+      gconf_instance.provider = {
+        request: (env, path) => {
+          if(path){
+            return _.get(conf, path);
+          }
+          return conf;
+        }
+      };
+
+      assert.deepEqual(gconf_instance.default.request(), base_config, 'selected with default');
+      assert.deepEqual(gconf_instance.request(), base_config, 'selected without default');
+      
+      assert.equal(gconf_instance.default.request('foo.bar'), base_config.foo.bar, 'selected with default and path');
+
     });
 
   });
