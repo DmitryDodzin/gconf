@@ -417,7 +417,32 @@ describe('core gconf functionality', () => {
     after(() => {
       mock_fs.restore();
     });
+  });
 
+  describe('request many', () => {
+
+    var complex_config = {
+      foo: 2000,
+      bar: {
+        the: 'best'
+      }
+    };
+
+    it('return many values', () => {
+
+      gconf_instance.registerProvider('memory', {
+        default: JSON.parse(JSON.stringify(complex_config))
+      });
+
+      var result_array = [
+        complex_config.foo,
+        complex_config.bar,
+        complex_config.bar.the
+      ];
+
+      assert.deepEqual(gconf_instance.requestMany('default', ['foo', 'bar', 'bar.the']), result_array, 'With default as parameter');
+      assert.deepEqual(gconf_instance.default.requestMany(['foo', 'bar', 'bar.the']), result_array, 'With default inline param');
+    });
 
   });
 
