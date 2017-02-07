@@ -1,8 +1,10 @@
 
 const _ = require('lodash');
+const path = require('path');
 const sinon = require('sinon');
 const chai = require('chai');
 const assert = chai.assert;
+const expect = chai.expect;
 const mock_fs = require('mock-fs');
 const YAML = require('yamljs');
 
@@ -370,6 +372,52 @@ describe('core gconf functionality', () => {
       assert.equal(gconf_instance.default.request('foo.bar'), base_config.foo.bar, 'selected with default and path');
 
     });
+
+  });
+
+  describe('.gconfrc tests', () => {
+
+    function load_rc_settings(settings){
+      var moch_config = {};
+      var basePosition = path.dirname(process.argv[1]);
+
+      moch_config[basePosition] = {
+        '.gconfrc': JSON.stringify(settings)
+      };
+
+      mock_fs(moch_config);
+    }
+
+    const rc_settings = {
+      config: {
+        memory: {}
+      }
+    };
+
+    before(() => {
+      load_rc_settings(rc_settings);
+    });
+
+    it('the correct config loaded', ()=>{
+      require('./lib/rcloader').forceReload();
+
+      let MemoryProvider = require('./lib/components/providers/memory');
+      assert.instanceOf(gconf.instance.provider, MemoryProvider);
+    });
+
+    it('fail non existant plugin', () => {
+
+      load_rc_settings({
+        plugins: ['sometesting']
+      });
+
+      expect(require('./lib/rcloader').forceReload).to.throw(Error);
+    });
+
+    after(() => {
+      mock_fs.restore();
+    });
+
 
   });
 
