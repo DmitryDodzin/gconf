@@ -444,6 +444,21 @@ describe('core gconf functionality', () => {
       assert.deepEqual(gconf_instance.default.requestMany(['foo', 'bar', 'bar.the']), result_array, 'With default inline param');
     });
 
+    it('check spread', () => {
+
+      gconf_instance.registerProvider('memory', {
+        default: JSON.parse(JSON.stringify(complex_config))
+      });
+
+      function checkSpread(foo, bar, bar_the){
+        assert.equal(foo, complex_config.foo, 'foo');
+        assert.deepEqual(bar, complex_config.bar, 'bar');
+        assert.equal(bar_the, complex_config.bar.the, 'bar.the');
+      }
+
+      checkSpread(...gconf_instance.default.requestMany(['foo', 'bar', 'bar.the']));
+    });
+
   });
 
 });
