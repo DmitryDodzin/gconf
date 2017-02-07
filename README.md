@@ -94,6 +94,20 @@ gconf.instance // == a gconf instance created in loadConfig.
 
 ```
 
+### .gconfrc
+
+Gconf can get the initial configuration for the singleton instance from a .gconfrc file (it's a json) aswell as external plugin loading
+
+```json
+{
+  "plugins": ["plugin-a", "plugin-b" ...],
+  "config": {
+    ... gconf config
+  }
+}
+
+```
+
 ## Providers
 
 ### Memory Provider
@@ -144,10 +158,26 @@ modifier name: ``` env ```
 
 ``` {prefix}{splitter}{path} ```
 example:
-``` GCONF_a_b_c = 'd' => { a: { b: { c: 'd' } } } /// when GCONF is prefix and '_' is splitter```
+
+``` 
+GCONF_a_b_c = 'd' => { a: { b: { c: 'd' } } } 
+/// when GCONF is prefix and '_' is splitter
+```
 
 Splitter and Prefix are defined in the modifier's constructor
 
+### Argv Modifier
+
+modifies the base config with the arguments provided in run
+
+modifier name: ``` argv ```
+
+the splitter is ```.```
+
+so:
+```bash
+node test.js --foo.bar=2000 // config => { foo: { bar: 2000 } }
+```
 
 ## Extend API
 
