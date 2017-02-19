@@ -105,7 +105,7 @@ describe('core gconf functionality', () => {
       
       gconf_instance.registerProvider('memory', base_config);
 
-      gconf_instance.default_domain = 'test';
+      gconf_instance.meta.default_domain = 'test';
 
       assert.deepEqual(gconf_instance.request(), base_config.test);
 
@@ -421,7 +421,7 @@ describe('core gconf functionality', () => {
     it('meta settings changed', () => {
       require('./lib/rcloader').forceReload();
 
-      expect(gconf.instance.default_domain).to.equal(rc_settings.config.gconf.default_domain);
+      expect(gconf.instance.meta.default_domain).to.equal(rc_settings.config.gconf.default_domain);
     });
 
     it('fail non existant plugin', () => {
