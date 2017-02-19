@@ -91,11 +91,23 @@ describe('core gconf functionality', () => {
 
     });
 
-    it('default env selection', done => {
+    it('default domain selection', done => {
       
       gconf_instance.registerProvider('memory', base_config);
 
       assert.deepEqual(gconf_instance.request(), base_config.default);
+
+      done();
+
+    });
+
+    it('changed default domain selection', done => {
+      
+      gconf_instance.registerProvider('memory', base_config);
+
+      gconf_instance.default_domain = 'test';
+
+      assert.deepEqual(gconf_instance.request(), base_config.test);
 
       done();
 
@@ -379,18 +391,19 @@ describe('core gconf functionality', () => {
 
     function load_rc_settings(settings){
       var moch_config = {};
-      var basePosition = path.dirname(process.argv[1]);
+      var config_path = path.join(process.cwd(), '.gconfrc');
 
-      moch_config[basePosition] = {
-        '.gconfrc': JSON.stringify(settings)
-      };
+      moch_config[config_path] = JSON.stringify(settings);
 
       mock_fs(moch_config);
     }
 
     const rc_settings = {
       config: {
-        memory: {}
+        memory: {},
+        gconf: {
+          default_domain: 'dev'
+        }
       }
     };
 
@@ -403,6 +416,12 @@ describe('core gconf functionality', () => {
 
       let MemoryProvider = require('./lib/components/providers/memory');
       assert.instanceOf(gconf.instance.provider, MemoryProvider);
+    });
+
+    it('meta settings changed', () => {
+      require('./lib/rcloader').forceReload();
+
+      expect(gconf.instance.default_domain).to.equal(rc_settings.config.gconf.default_domain);
     });
 
     it('fail non existant plugin', () => {
