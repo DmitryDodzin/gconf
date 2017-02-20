@@ -91,11 +91,23 @@ describe('core gconf functionality', () => {
 
     });
 
-    it('default env selection', done => {
+    it('default domain selection', done => {
       
       gconf_instance.registerProvider('memory', base_config);
 
       assert.deepEqual(gconf_instance.request(), base_config.default);
+
+      done();
+
+    });
+
+    it('changed default domain selection', done => {
+      
+      gconf_instance.registerProvider('memory', base_config);
+
+      gconf_instance.meta.default_domain = 'test';
+
+      assert.deepEqual(gconf_instance.request(), base_config.test);
 
       done();
 
@@ -379,18 +391,19 @@ describe('core gconf functionality', () => {
 
     function load_rc_settings(settings){
       var moch_config = {};
-      var basePosition = path.dirname(process.argv[1]);
+      var config_path = path.join(process.cwd(), '.gconfrc');
 
-      moch_config[basePosition] = {
-        '.gconfrc': JSON.stringify(settings)
-      };
+      moch_config[config_path] = JSON.stringify(settings);
 
       mock_fs(moch_config);
     }
 
     const rc_settings = {
       config: {
-        memory: {}
+        memory: {},
+        gconf: {
+          default_domain: 'dev'
+        }
       }
     };
 
@@ -405,6 +418,12 @@ describe('core gconf functionality', () => {
       assert.instanceOf(gconf.instance.provider, MemoryProvider);
     });
 
+    it('meta settings changed', () => {
+      require('./lib/rcloader').forceReload();
+
+      expect(gconf.instance.meta.default_domain).to.equal(rc_settings.config.gconf.default_domain);
+    });
+
     it('fail non existant plugin', () => {
 
       load_rc_settings({
@@ -417,7 +436,47 @@ describe('core gconf functionality', () => {
     after(() => {
       mock_fs.restore();
     });
+  });
 
+  describe('request many', () => {
+
+    var complex_config = {
+      foo: 2000,
+      bar: {
+        the: 'best'
+      }
+    };
+
+    it('return many values', () => {
+
+      gconf_instance.registerProvider('memory', {
+        default: JSON.parse(JSON.stringify(complex_config))
+      });
+
+      var result_array = [
+        complex_config.foo,
+        complex_config.bar,
+        complex_config.bar.the
+      ];
+
+      assert.deepEqual(gconf_instance.requestMany('default', ['foo', 'bar', 'bar.the']), result_array, 'With default as parameter');
+      assert.deepEqual(gconf_instance.default.requestMany(['foo', 'bar', 'bar.the']), result_array, 'With default inline param');
+    });
+
+    it('check spread', () => {
+
+      gconf_instance.registerProvider('memory', {
+        default: JSON.parse(JSON.stringify(complex_config))
+      });
+
+      function checkSpread(foo, bar, bar_the){
+        assert.equal(foo, complex_config.foo, 'foo');
+        assert.deepEqual(bar, complex_config.bar, 'bar');
+        assert.equal(bar_the, complex_config.bar.the, 'bar.the');
+      }
+
+      checkSpread(...gconf_instance.default.requestMany(['foo', 'bar', 'bar.the']));
+    });
 
   });
 

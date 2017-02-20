@@ -6,7 +6,7 @@ Global Configuration for the masses.
 ## GConf
 
 ```javascript
-  const gconf = new GConf();
+  const gconf_instance = new GConf();
 ```
 
 The ```GConf``` Object is the base and main API for the library.
@@ -48,23 +48,46 @@ example config for creating a [memory provider](#memory-provider) with an [env m
 
 this gives me a object ``` { foo: 'bar' } ``` for requesting dev and  ``` { foo: 'bar2000' } ``` for prod.
 
-###``` gconf.request(domain, path) ```
+###``` GConf.get(domain, path) ```
 
 this is the function to use to get the data from the config, meaning (with the example config above) you will get 
 
 ```javascript
 
-  gconf.request('dev') // { foo: 'bar' }
-  gconf.request('dev', 'foo') // 'bar'
+  gconf_instance.get('dev') // { foo: 'bar' }
+  gconf_instance.get('dev', 'foo') // 'bar'
 
 ```
 
 ```domain``` is the domain (maybe env or any other generlisation) where to look, defined in provider's constructor (options)
 ```path``` is for geting specific parts of the config and not the entire thing
 
+### GConf.meta
+
+This is a meta-options for gconf, for example the default domain when none is given
+
 ###``` gconf.registerProvider(provider, options) ``` & ``` gconf.registerModifier(modifier, options) ```
 
 Are a way to register modifiers and providers not in the constructor
+
+### GConf.default
+
+Allows to acess functions with default domain, this defaults to 'default' =|
+
+```javascript
+
+// lets say in our domain named 'default' has { foo: 'bar' }
+
+gconf_instance.get('default', 'foo'); // -> 'bar'
+gconf_instance.default.get('foo'); // -> 'bar'
+
+and if we change it to 'dev' it should be like:
+
+gconf_instance.meta.default_domain = 'dev';
+
+gconf_instance.get('dev') === gconf_instance.default.get();
+
+```
 
 ### Singleton Registration
 
@@ -73,14 +96,14 @@ The library implements a singleton factory to save the loaded config.
 ```javascript
 
 var options = {
-  ...
+  // ...
 }
 
 gconf_instance = new GConf(options);
 
-gconf.loadConfig(gconf_instance); // The loadConfig will retrive ither GConf instance
+gconf.load(gconf_instance); // The 'load' will retrive ither GConf instance
 
-gconf.loadConfig(options); // or the constructor params for the GConf instance
+gconf.load(options); // or the constructor params for the GConf instance
 
 ```
 
@@ -90,7 +113,7 @@ and then you can access it from any part the application
 
 var gconf = require('gconf');
 
-gconf.instance // == a gconf instance created in loadConfig.
+gconf.instance // == a gconf instance created in 'load'.
 
 ```
 
@@ -100,9 +123,9 @@ Gconf can get the initial configuration for the singleton instance from a .gconf
 
 ```json
 {
-  "plugins": ["plugin-a", "plugin-b" ...],
+  "plugins": ["plugin-a", "plugin-b"],
   "config": {
-    ... gconf config
+    // ... gconf config
   }
 }
 
