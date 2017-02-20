@@ -28,7 +28,7 @@ class ProviderTester {
       )
     );
 
-    describe('path requrire', () => {
+    describe('path require', () => {
 
       it('simple', () => 
         this.domains.forEach(domain => 
