@@ -120,6 +120,9 @@ describe('core gconf functionality', () => {
       complex: {
         foo: {
           bar: 2000
+        },
+        bar: {
+          t: { a: { p: 2 }}
         }
       }
     };
@@ -147,12 +150,16 @@ describe('core gconf functionality', () => {
 
       process.env.GCONF_foo = basic_mod;
       process.env.GCONF_complex_foo = JSON.stringify(complex_mod);
+      process.env.GCONF_complex_bar_t_a_p = JSON.stringify(basic_mod);
 
       assert.equal(gconf_instance.request('default').foo, basic_mod, 'without selector');
       assert.equal(gconf_instance.request('default', 'foo'), basic_mod, 'with selector');
       
       assert.deepEqual(gconf_instance.request('default').complex.foo, complex_mod, 'complex with selector');
       assert.deepEqual(gconf_instance.request('default', 'complex.foo'), complex_mod, 'complex with selector');
+
+      assert.deepEqual(gconf_instance.request('default').complex.bar.t.a.p, basic_mod, 'long with selector');
+      assert.deepEqual(gconf_instance.request('default', 'complex.bar.t.a.p'), basic_mod, 'long with selector');
 
       done();
     });
