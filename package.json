@@ -1,10 +1,15 @@
 {
   "name": "gconf",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Global and dynamic config provider",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test.js"
+    "test": "mocha test.js",
+    "cover": "istanbul cover node_modules/mocha/bin/_mocha",
+    "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   },
   "keywords": [
     "config",
@@ -14,18 +19,42 @@
   ],
   "author": "Dmitry Dodzin",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DmitryDodzin/gconf/issues"
+  },
+  "homepage": "https://github.com/DmitryDodzin/gconf#readme",
+  "contributors": [
+    {
+      "name": "Dmitry Dodzin",
+      "email": "d.dodzin@gmail.com"
+    }
+  ],
   "dependencies": {
+    "immutable": "^3.8.1",
     "lodash": "^4.17.2",
     "yamljs": "^0.2.8",
-    "yargs": "^6.5.0"
+    "yargs": "^8.0.0"
   },
+  "maintainers": [
+    {
+      "name": "Dmitry Dodzin",
+      "email": "d.dodzin@gmail.com"
+    }
+  ],
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mock-fs": "^3.12.1",
-    "sinon": "^1.17.6"
+    "chai": "^4.0.0",
+    "coveralls": "^2.13.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.4.2",
+    "mocha-lcov-reporter": "^1.3.0",
+    "mock-fs": "^4.4.0",
+    "sinon": "^2.3.4"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/DmitryDodzin/gconf.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

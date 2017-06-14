@@ -1,6 +1,8 @@
 
 # GConf
 
+[![Build Status](https://travis-ci.org/DmitryDodzin/gconf.svg?branch=master)](https://travis-ci.org/DmitryDodzin/gconf) [![dependencies Status](https://david-dm.org/DmitryDodzin/gconf/status.svg)](https://david-dm.org/DmitryDodzin/gconf) [![Coverage Status](https://coveralls.io/repos/github/DmitryDodzin/gconf/badge.svg?branch=master)](https://coveralls.io/github/DmitryDodzin/gconf?branch=master)
+
 Global Configuration for the masses.
 
 ## GConf
