@@ -8,6 +8,9 @@
     "cover": "istanbul cover node_modules/mocha/bin/_mocha",
     "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "keywords": [
     "config",
     "global",
@@ -16,12 +19,28 @@
   ],
   "author": "Dmitry Dodzin",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DmitryDodzin/gconf/issues"
+  },
+  "homepage": "https://github.com/DmitryDodzin/gconf#readme",
+  "contributors": [
+    {
+      "name": "Dmitry Dodzin",
+      "email": "d.dodzin@gmail.com"
+    }
+  ],
   "dependencies": {
     "immutable": "^3.8.1",
     "lodash": "^4.17.2",
     "yamljs": "^0.2.8",
     "yargs": "^8.0.0"
   },
+  "maintainers": [
+    {
+      "name": "Dmitry Dodzin",
+      "email": "d.dodzin@gmail.com"
+    }
+  ],
   "devDependencies": {
     "chai": "^4.0.0",
     "coveralls": "^2.13.1",
@@ -34,5 +53,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/DmitryDodzin/gconf.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
