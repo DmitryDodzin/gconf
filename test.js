@@ -112,6 +112,24 @@ describe('core gconf functionality', () => {
       done();
 
     });
+
+    it('use node_env', done => {
+      
+      gconf_instance.registerProvider('memory', base_config);
+
+      process.env.NODE_ENV = 'test';
+
+      gconf_instance.meta.node_env = true;
+
+      assert.deepEqual(gconf_instance.get(), base_config.test);
+      
+      process.env.NODE_ENV = 'dev';
+
+      assert.deepEqual(gconf_instance.get(), base_config.dev);
+
+      done();
+
+    });
   });
 
   describe('env modifier', () => {
