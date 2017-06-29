@@ -1,6 +1,6 @@
 {
   "name": "gconf",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Global and dynamic config provider",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,7 @@
   "dependencies": {
     "immutable": "^3.8.1",
     "lodash": "^4.17.2",
-    "yamljs": "^0.2.8",
+    "yamljs": "^0.3.0",
     "yargs": "^8.0.0"
   },
   "maintainers": [
