@@ -15,7 +15,7 @@ The ```GConf``` Object is the base and main API for the library.
 
 The constructor for the class can register modifiers and providers (Note currenty there can be only one provider) from the options object.
 
-###```options```
+###   ```options```
 
 ```javascript
   {
@@ -50,7 +50,7 @@ example config for creating a [memory provider](#memory-provider) with an [env m
 
 this gives me a object ``` { foo: 'bar' } ``` for requesting dev and  ``` { foo: 'bar2000' } ``` for prod.
 
-###``` GConf.get(domain, path) ```
+### ``` GConf.get(domain, path) ```
 
 this is the function to use to get the data from the config, meaning (with the example config above) you will get 
 
@@ -68,7 +68,7 @@ this is the function to use to get the data from the config, meaning (with the e
 
 This is a meta-options for gconf, for example the default domain when none is given
 
-###``` gconf.registerProvider(provider, options) ``` & ``` gconf.registerModifier(modifier, options) ```
+### ``` gconf.registerProvider(provider, options) ``` & ``` gconf.registerModifier(modifier, options) ```
 
 Are a way to register modifiers and providers not in the constructor
 
@@ -127,11 +127,13 @@ Gconf can get the initial configuration for the singleton instance from a .gconf
 {
   "plugins": ["plugin-a", "plugin-b"],
   "config": {
-    // ... gconf config
+    "gconf": "config"
   }
 }
 
 ```
+
+With .gconfrc you can use ``` require('gconf/default'); // The same as require('gconf').instance.default ```
 
 ## Providers
 
